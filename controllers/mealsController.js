@@ -54,10 +54,10 @@ const createNewMeal = asyncHandler(async (req, res) => {
 // @route PATCH /meals
 // @access Private
 const updateMeal = asyncHandler(async (req, res) => {
-  const { user, mealId, name, description, active } = req.body
+  const { user, id, name, description, active } = req.body
 
   // Confirm data 
-  if (!user || !mealId || !name || !description || typeof active !== 'boolean') {
+  if (!user || !id || !name || !description || typeof active !== 'boolean') {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -69,7 +69,7 @@ const updateMeal = asyncHandler(async (req, res) => {
   }
 
   // Does the meal exist?
-  const meal = await Meal.findById(mealId).exec()
+  const meal = await Meal.findById(id).exec()
 
   if (!meal) {
     return res.status(400).json({ message: 'Meal not found' })
@@ -79,7 +79,7 @@ const updateMeal = asyncHandler(async (req, res) => {
   const duplicate = await Meal.find({ user }).findOne({ name }).lean().exec()
 
   // Allow updates to the original meal
-  if (duplicate && duplicate?._id.toString() !== mealId) {
+  if (duplicate && duplicate?._id.toString() !== id) {
     return res.status(409).json({ message: 'Duplicate meal name' })
   }
 
@@ -96,10 +96,10 @@ const updateMeal = asyncHandler(async (req, res) => {
 // @route DELETE /meals
 // @access Private
 const deleteMeal = asyncHandler(async (req, res) => {
-  const { user, mealId } = req.body
+  const { user, id } = req.body
 
   // Confirm data
-  if (!user || !mealId) {
+  if (!user || !id) {
     return res.status(400).json({ message: 'User ID and Meal ID Required' })
   }
 
@@ -111,7 +111,7 @@ const deleteMeal = asyncHandler(async (req, res) => {
   }
 
   // Does the meal exist?
-  const meal = await Meal.findById(mealId).exec()
+  const meal = await Meal.findById(id).exec()
 
   if (!meal) {
     return res.status(400).json({ message: 'Meal not found' })
