@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const AutoIncrement = require('mongoose-sequence')(mongoose)
 
-const mealSchema = new mongoose.Schema(
+const constraintSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,27 +15,19 @@ const mealSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true
-    },    
+    },
     ingredients: [{
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Ingredient'
     }],
-    description: {
-      type: String,
-      required: true
-    },
     maxOccurance: {
       type: Number,
-      default: 1
-    },
-    timeReset: {
-      type: Number,
-      default: 7
+      required: true
     },
     shorttermAdj: {
       type: Number,
-      default: 3
+      required: true
     }
   },
   {
@@ -43,10 +35,10 @@ const mealSchema = new mongoose.Schema(
   }
 )
 
-mealSchema.plugin(AutoIncrement, {
-  inc_field: 'meal',
-  id: 'mealId',
+constraintSchema.plugin(AutoIncrement, {
+  inc_field: 'constraint',
+  id: 'constraintId',
   start_seq: 1
 })
 
-module.exports = mongoose.model('Meal', mealSchema)
+module.exports = mongoose.model('Constraint', constraintSchema)
