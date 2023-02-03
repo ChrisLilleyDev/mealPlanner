@@ -17,10 +17,10 @@ const getAllMeals = asyncHandler(async (req, res) => {
 // @route POST /meals
 // @access Private
 const createNewMeal = asyncHandler(async (req, res) => {
-  const { user, name, description } = req.body
+  const { user, name, ingredients, description } = req.body
 
   // Confirm data
-  if (!user || !name || !description) {
+  if (!user || !name || !description || !Array.isArray(ingredients) || !ingredients.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -38,7 +38,7 @@ const createNewMeal = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: 'Duplicate meal' })
   }
 
-  const mealObject = { user, name, description }
+  const mealObject = { user, name, description, ingredients }
 
   // Create and store new meal
   const meal = await Meal.create(mealObject)
@@ -54,10 +54,10 @@ const createNewMeal = asyncHandler(async (req, res) => {
 // @route PATCH /meals
 // @access Private
 const updateMeal = asyncHandler(async (req, res) => {
-  const { user, id, name, description, active } = req.body
+  const { user, id, name, active, ingredients, description, maxOccurance, timeReset, shorttermAdj } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || !description || typeof active !== 'boolean') {
+  if (!user || !id || !name || !description || typeof active !== 'boolean' || !Array.isArray(ingredients) || !ingredients.length || !maxOccurance || !timeReset || !shorttermAdj) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -84,8 +84,12 @@ const updateMeal = asyncHandler(async (req, res) => {
   }
 
   meal.name = name
-  meal.description = description
   meal.active = active
+  meal.ingredients = ingredients
+  meal.description = description
+  meal.maxOccurance = maxOccurance
+  meal.timeReset = timeReset
+  meal.shorttermAdj = shorttermAdj
 
   const updatedMeal = await meal.save()
 
