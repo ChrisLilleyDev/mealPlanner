@@ -20,7 +20,7 @@ const createNewMeal = asyncHandler(async (req, res) => {
   const { user, name, ingredients, description } = req.body
 
   // Confirm data
-  if (!user || !name || !description || !Array.isArray(ingredients) || !ingredients.length) {
+  if (!user || !name) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 

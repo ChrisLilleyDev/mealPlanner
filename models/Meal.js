@@ -18,7 +18,6 @@ const mealSchema = new mongoose.Schema(
     },    
     ingredients: [{
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: 'Ingredient'
     }],
     description: {

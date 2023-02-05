@@ -29,7 +29,7 @@ app.use('/', require('./routes/root'))
 app.use('/users', require('./routes/userRoutes'))
 app.use('/meals', require('./routes/mealRoutes'))
 app.use('/ingredients', require('./routes/ingredientRoutes'))
-app.use('/constraint', require('./routes/constraintRoutes'))
+app.use('/constraints', require('./routes/constraintRoutes'))
 
 app.all('*', (req, res) => {
     res.status(404)
