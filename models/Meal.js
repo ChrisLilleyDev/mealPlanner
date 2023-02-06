@@ -21,8 +21,7 @@ const mealSchema = new mongoose.Schema(
       ref: 'Ingredient'
     }],
     description: {
-      type: String,
-      required: true
+      type: String
     },
     maxOccurance: {
       type: Number,

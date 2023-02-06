@@ -57,7 +57,7 @@ const updateMeal = asyncHandler(async (req, res) => {
   const { user, id, name, active, ingredients, description, maxOccurance, timeReset, shorttermAdj } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || !description || typeof active !== 'boolean' || !Array.isArray(ingredients) || !ingredients.length || !maxOccurance || !timeReset || !shorttermAdj) {
+  if (!user || !id || !name || typeof active !== 'boolean' || !Array.isArray(ingredients) || !maxOccurance || !timeReset || !shorttermAdj) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
