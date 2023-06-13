@@ -20,7 +20,7 @@ const createNewPlanTemplate = asyncHandler(async (req, res) => {
   const { user, name, size, constraints } = req.body
 
   // Confirm data
-  if (!user || !name || !size) {
+  if (!user || !name) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 

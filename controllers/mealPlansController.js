@@ -2,8 +2,6 @@ const User = require('../models/User')
 const MealPlan = require('../models/MealPlan')
 const asyncHandler = require('express-async-handler')
 
-////TODO/////
-
 // @desc Get all mealPlans
 // @route GET /mealPlans
 // @access Private
@@ -56,10 +54,10 @@ const createNewMealPlan = asyncHandler(async (req, res) => {
 // @route PATCH /mealPlans
 // @access Private
 const updateMealPlan = asyncHandler(async (req, res) => {
-  const { user, id, name, active } = req.body
+  const { user, id, name, active, size, constraints, inventory, history, currentMeals } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || typeof active !== 'boolean') {
+  if (!user || !id || !name || typeof active !== 'boolean' || !size || !inventory || !currentMeals) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -87,6 +85,11 @@ const updateMealPlan = asyncHandler(async (req, res) => {
 
   mealPlan.name = name
   mealPlan.active = active
+  mealPlan.size = size
+  mealPlan.constraints = constraints
+  mealPlan.inventory = inventory
+  mealPlan.history = history
+  mealPlan.currentMeals = currentMeals
 
   const updatedMealPlan = await mealPlan.save()
 

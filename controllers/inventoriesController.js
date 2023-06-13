@@ -2,9 +2,6 @@ const User = require('../models/User')
 const Inventory = require('../models/Inventory')
 const asyncHandler = require('express-async-handler')
 
-//////TODO///////
-
-
 // @desc Get all inventories
 // @route GET /inventories
 // @access Private
@@ -20,10 +17,10 @@ const getAllInventories = asyncHandler(async (req, res) => {
 // @route POST /inventories
 // @access Private
 const createNewInventory = asyncHandler(async (req, res) => {
-  const { user, name, ingredients, maxOccurance, shorttermAdj } = req.body
+  const { user, name, content } = req.body
 
   // Confirm data
-  if (!user || !name || !Array.isArray(ingredients) || !ingredients.length || !maxOccurance || !shorttermAdj) {
+  if (!user || !name || !Array.isArray(content) || !content.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -41,7 +38,7 @@ const createNewInventory = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: 'Duplicate inventory' })
   }
 
-  const inventoryObject = { user, name, ingredients, maxOccurance, shorttermAdj }
+  const inventoryObject = { user, name, content }
 
   // Create and store new inventory
   const inventory = await Inventory.create(inventoryObject)
@@ -57,10 +54,10 @@ const createNewInventory = asyncHandler(async (req, res) => {
 // @route PATCH /inventories
 // @access Private
 const updateInventory = asyncHandler(async (req, res) => {
-  const { user, id, name, active, ingredients, maxOccurance, shorttermAdj } = req.body
+  const { user, id, name, active, content } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || typeof active !== 'boolean' || !Array.isArray(ingredients) || !ingredients.length || !maxOccurance || !shorttermAdj) {
+  if (!user || !id || !name || typeof active !== 'boolean' || !Array.isArray(content) || !content.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -88,10 +85,8 @@ const updateInventory = asyncHandler(async (req, res) => {
 
   inventory.name = name
   inventory.active = active
-  inventory.ingredients = ingredients
-  inventory.maxOccurance = maxOccurance
-  inventory.shorttermAdj = shorttermAdj
-  
+  inventory.content = content
+
   const updatedInventory = await inventory.save()
 
   res.json({ message: `${updatedInventory.name} updated` })

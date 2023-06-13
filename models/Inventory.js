@@ -22,25 +22,13 @@ const inventorySchema = new mongoose.Schema(
         required: true,
         ref: 'Meal'
       },
-      maxOccurance: {
-        type: Number,
-        required: true
-      },
-      timeReset: {
-        type: Number,
-        required: true
-      },
-      shorttermAdj: {
-        type: Number,
-        required: true
-      },
       remainingUses: {
         type: Number,
         required: true
       },
-      cooldown: {
-        type: Number,
-        default: 0
+      nextUseDate: {
+        type: Date,
+        default: new Date()
       }
     }]
   },
