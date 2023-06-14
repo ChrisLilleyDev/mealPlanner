@@ -17,10 +17,10 @@ const getAllMealPlans = asyncHandler(async (req, res) => {
 // @route POST /mealPlans
 // @access Private
 const createNewMealPlan = asyncHandler(async (req, res) => {
-  const { user, name } = req.body
+  const { user, name, size, constraints, inventory, history, currentMeals } = req.body
 
   // Confirm data
-  if (!user || !name ) {
+  if (!user || !name || !inventory || !Array.isArray(currentMeals) || !currentMeals.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -38,7 +38,7 @@ const createNewMealPlan = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: 'Duplicate mealPlan' })
   }
 
-  const mealPlanObject = { user, name }
+  const mealPlanObject = { user, name, size, constraints, inventory, history, currentMeals }
 
   // Create and store new mealPlan
   const mealPlan = await MealPlan.create(mealPlanObject)
