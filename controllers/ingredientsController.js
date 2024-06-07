@@ -6,7 +6,8 @@ const asyncHandler = require('express-async-handler')
 // @route GET /ingredients
 // @access Private
 const getAllIngredients = asyncHandler(async (req, res) => {
-  const ingredients = await Ingredient.find().lean().exec()
+  const { user } = req.userInfo
+  const ingredients = await Ingredient.find({ user }).lean().exec()
   if (!ingredients?.length) {
     return res.status(400).json({ message: 'No ingredients found' })
   }
@@ -17,10 +18,11 @@ const getAllIngredients = asyncHandler(async (req, res) => {
 // @route POST /ingredients
 // @access Private
 const createNewIngredient = asyncHandler(async (req, res) => {
-  const { user, name } = req.body
+  const { user } = req.userInfo
+  const { name } = req.body
 
   // Confirm data
-  if (!user || !name ) {
+  if (!name) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -32,7 +34,7 @@ const createNewIngredient = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate name
-  const duplicate = await Ingredient.find({ user }).findOne({ name }).lean().exec()
+  const duplicate = await Ingredient.find({ user }).findOne({ name }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   if (duplicate) {
     return res.status(409).json({ message: 'Duplicate ingredient' })
@@ -54,10 +56,11 @@ const createNewIngredient = asyncHandler(async (req, res) => {
 // @route PATCH /ingredients
 // @access Private
 const updateIngredient = asyncHandler(async (req, res) => {
-  const { user, id, name, active } = req.body
+  const { user } = req.userInfo
+  const { id, name, active } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || typeof active !== 'boolean') {
+  if (!id || !name || typeof active !== 'boolean') {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -76,7 +79,7 @@ const updateIngredient = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate 
-  const duplicate = await Ingredient.find({ user }).findOne({ name }).lean().exec()
+  const duplicate = await Ingredient.find({ user }).findOne({ name }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   // Allow updates to the original ingredient
   if (duplicate && duplicate?._id.toString() !== id) {
@@ -95,11 +98,12 @@ const updateIngredient = asyncHandler(async (req, res) => {
 // @route DELETE /ingredients
 // @access Private
 const deleteIngredient = asyncHandler(async (req, res) => {
-  const { user, id } = req.body
+  const { user } = req.userInfo
+  const { id } = req.body
 
   // Confirm data
-  if (!user || !id) {
-    return res.status(400).json({ message: 'User ID and Ingredient ID Required' })
+  if (!id) {
+    return res.status(400).json({ message: 'Ingredient ID Required' })
   }
 
   // Does the user exist?

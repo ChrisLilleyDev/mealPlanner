@@ -16,7 +16,7 @@ const inventorySchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
-    content: [{
+    contents: [{
       meal: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -26,9 +26,13 @@ const inventorySchema = new mongoose.Schema(
         type: Number,
         required: true
       },
+      nextResetDate: {
+        type: Date,
+        required: true
+      },
       nextUseDate: {
         type: Date,
-        default: new Date()
+        required: true
       }
     }]
   },

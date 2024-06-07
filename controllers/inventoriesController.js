@@ -6,7 +6,8 @@ const asyncHandler = require('express-async-handler')
 // @route GET /inventories
 // @access Private
 const getAllInventories = asyncHandler(async (req, res) => {
-  const inventories = await Inventory.find().lean().exec()
+  const { user } = req.userInfo
+  const inventories = await Inventory.find({ user }).lean().exec()
   if (!inventories?.length) {
     return res.status(400).json({ message: 'No inventories found' })
   }
@@ -17,10 +18,11 @@ const getAllInventories = asyncHandler(async (req, res) => {
 // @route POST /inventories
 // @access Private
 const createNewInventory = asyncHandler(async (req, res) => {
-  const { user, name, content } = req.body
+  const { user } = req.userInfo
+  const { name, contents } = req.body
 
   // Confirm data
-  if (!user || !name || !Array.isArray(content) || !content.length) {
+  if (!name || !Array.isArray(contents) || !contents.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -32,13 +34,13 @@ const createNewInventory = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate name
-  const duplicate = await Inventory.find({ user }).findOne({ name }).lean().exec()
+  const duplicate = await Inventory.find({ user }).findOne({ name }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   if (duplicate) {
     return res.status(409).json({ message: 'Duplicate inventory' })
   }
 
-  const inventoryObject = { user, name, content }
+  const inventoryObject = { user, name, contents }
 
   // Create and store new inventory
   const inventory = await Inventory.create(inventoryObject)
@@ -54,10 +56,11 @@ const createNewInventory = asyncHandler(async (req, res) => {
 // @route PATCH /inventories
 // @access Private
 const updateInventory = asyncHandler(async (req, res) => {
-  const { user, id, name, active, content } = req.body
+  const { user } = req.userInfo
+  const { id, name, active, contents } = req.body
 
   // Confirm data 
-  if (!user || !id || !name || typeof active !== 'boolean' || !Array.isArray(content) || !content.length) {
+  if (!id || !name || typeof active !== 'boolean' || !Array.isArray(contents) || !contents.length) {
     return res.status(400).json({ message: 'All fields are required' })
   }
 
@@ -76,7 +79,7 @@ const updateInventory = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate 
-  const duplicate = await Inventory.find({ user }).findOne({ name }).lean().exec()
+  const duplicate = await Inventory.find({ user }).findOne({ name }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   // Allow updates to the original inventory
   if (duplicate && duplicate?._id.toString() !== id) {
@@ -85,7 +88,31 @@ const updateInventory = asyncHandler(async (req, res) => {
 
   inventory.name = name
   inventory.active = active
-  inventory.content = content
+  inventory.contents = contents
+
+  const updatedInventory = await inventory.save()
+
+  res.json({ message: `${updatedInventory.name} updated` })
+})
+
+// @desc Update an inventories contents
+const updateInventoryContents = asyncHandler(async (req, res) => {
+  const id = req.body.inventory
+  const contents = req.body.updatedContents
+
+  // Confirm data 
+  if (!id || !Array.isArray(contents) || !contents.length) {
+    return res.status(400).json({ message: 'All fields are required' })
+  }
+
+  // Does the inventory exist?
+  const inventory = await Inventory.findById(id).exec()
+
+  if (!inventory) {
+    return res.status(400).json({ message: 'Inventory not found' })
+  }
+
+  inventory.contents = contents
 
   const updatedInventory = await inventory.save()
 
@@ -96,10 +123,11 @@ const updateInventory = asyncHandler(async (req, res) => {
 // @route DELETE /inventories
 // @access Private
 const deleteInventory = asyncHandler(async (req, res) => {
-  const { user, id } = req.body
+  const { user } = req.userInfo
+  const { id } = req.body
 
   // Confirm data
-  if (!user || !id) {
+  if (!id) {
     return res.status(400).json({ message: 'User ID and Inventory ID Required' })
   }
 
@@ -134,5 +162,6 @@ module.exports = {
   getAllInventories,
   createNewInventory,
   updateInventory,
+  updateInventoryContents,
   deleteInventory
 }

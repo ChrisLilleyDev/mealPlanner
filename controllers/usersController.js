@@ -3,19 +3,20 @@ const Meal = require('../models/Meal')
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 
-// @desc Get all users
-// @route GET /users
+// @desc Get user
+// @route GET /user
 // @access Private
-const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select('-password').lean().exec()
-  if (!users?.length) {
-    return res.status(400).json({ message: 'No users found' })
+const getUser = asyncHandler(async (req, res) => {
+  const { user } = req.userInfo
+  const userDetails = await User.findById(user).select('-password').lean().exec()
+  if (!userDetails) {
+    return res.status(400).json({ message: 'No user found' })
   }
-  res.json(users)
+  res.json(userDetails)
 })
 
 // @desc Create new user
-// @route POST /users
+// @route POST /user
 // @access Private
 const createNewUser = asyncHandler(async (req, res) => {
   const { username, password, roles } = req.body
@@ -26,7 +27,7 @@ const createNewUser = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate username
-  const duplicate = await User.findOne({ username }).lean().exec()
+  const duplicate = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   if (duplicate) {
     return res.status(409).json({ message: 'Duplicate username' })
@@ -48,7 +49,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 })
 
 // @desc Update a user
-// @route PATCH /users
+// @route PATCH /user
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
   const { id, username, roles, active, password } = req.body
@@ -66,7 +67,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   // Check for duplicate 
-  const duplicate = await User.findOne({ username }).lean().exec()
+  const duplicate = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
 
   // Allow updates to the original user 
   if (duplicate && duplicate?._id.toString() !== id) {
@@ -88,7 +89,7 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 // @desc Delete a user
-// @route DELETE /users
+// @route DELETE /user
 // @access Private
 const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.body
@@ -119,7 +120,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 })
 
 module.exports = {
-  getAllUsers,
+  getUser,
   createNewUser,
   updateUser,
   deleteUser

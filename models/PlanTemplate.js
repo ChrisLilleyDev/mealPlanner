@@ -18,10 +18,11 @@ const planTemplateSchema = new mongoose.Schema(
     },
     size: {
       type: Number,
-      default: 7
+      required: true
     },
     constraints: [{
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
       ref: 'Constraint'
     }]
   },

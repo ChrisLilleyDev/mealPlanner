@@ -16,6 +16,14 @@ const mealPlanSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    startDate: {
+      type: Date,
+      required: true
+    },
+    endDate: {
+      type: Date,
+      required: true
+    },
     size: {
       type: Number,
       default: 7
@@ -33,7 +41,7 @@ const mealPlanSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Meal'
     }]],
-    currentMeals: [{
+    current: [{
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Meal'
